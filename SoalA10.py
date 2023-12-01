@@ -8,76 +8,73 @@ import numpy as np
 import altair as alt
 import time
 import streamlit as st
+import matplotlib.pyplot as plt
 
-model = pickle.load(open('model_prediksi_harga_mobil.sav', 'rb'))
+st.title('WELCOME')
 
+menu = ['Home', 'Dashboard', 'Profile']
+selected_menu = st.sidebar.selectbox('Menu', menu)
 
-with st.spinner('Wait for it...'):
-    time.sleep(5)
-st.success('Done!')
+if selected_menu == 'Home':
+    st.subheader('Welcome to Home Page DHARIZZ')
+    st.image('image2.jpeg', use_column_width=True)
 
-#ambil waktu saat ini
-now = datetime.datetime.now()
+    # Read dataset (csv)
+    data = pd.read_csv('data2.csv')
 
-#format waktu tanggal
-formatted_now = now.strftime("%d/%m/%Y %H:%M:%S")
+    # Display a sample of the dataset
+    st.subheader('Sample of the Dataset:')
+    st.write(data.head(10))
 
-#tampilkan waktu tanggal
-st.write("Waktu tanggal up to date: " + formatted_now)
+    # Create a function to generate the plot
+    def plot_bar_chart(data):
+        fig, ax = plt.subplots()
+        if np.issubdtype(data.dtype, np.number):
+            data.plot(kind='bar', ax=ax)
+        else:
+            data.value_counts().plot(kind='bar', ax=ax)
+        st.pyplot(fig)
 
+    # Create a select box for the user to choose the feature to plot
+    features = data.columns.tolist()
+    selected_feature = st.selectbox('Choose the feature to plot', features)
 
+    # Filter the data based on the selected feature
+    filtered_data = data[selected_feature]
 
-st.title('Prediksi Harga Mobil')
-st.image('car.jpg')
+    # Plot the bar chart based on the selected feature
+    plot_bar_chart(filtered_data)
 
-#open file csv
-df1 = pd.read_csv("CarPrice.csv")
+elif selected_menu == 'Dashboard':
+    st.subheader('Welcome to Dashboard DHARIZZ')
+    st.image('image2.jpeg', use_column_width=True)
 
-view = st.sidebar.selectbox('Tampilkan data', ['Dataset', 'Grafik Highway-mpg', 'Grafik curbweight', 'Grafik horsepower'])
+    # Read dataset (csv)
+    data = pd.read_csv('data2.csv')
 
-if view == 'Dataset':
-    st.header("Dataset")
-    st.dataframe(df1)
+    # Your dashboard-specific code goes here
+    st.write("This is the Dashboard page. You can add your specific content here.")
 
-elif view == 'Grafik Highway-mpg':
-    st.write("Grafik Highway-mpg")
-    chart_highwaympg = df1['highwaympg']
-    st.line_chart(chart_highwaympg)
+# Other pages can be added similarly
+elif selected_menu == 'Profile':
+    st.subheader('Welcome to Profile Page DHARIZZ')
 
-elif view == 'Grafik curbweight':
-    st.write("Grafik curbweight")
-    chart_curbweight = df1['curbweight']
-    st.line_chart(chart_curbweight)
+    # Add a form for personal biodata
+    st.subheader('Personal Biodata:')
+    name = st.text_input('Name', '')
+    age = st.number_input('Age', 0, 150, 0)
+    address = st.text_area('Address', '')
 
-elif view == 'Grafik horsepower':
-    st.write("Grafik horsepower")
-    chart_horsepower = pd.DataFrame(df1, columns=["horsepower"])
-    st.line_chart(chart_horsepower)
+    # Add a file uploader for a photo
+    st.subheader('Upload Photo:')
+    uploaded_file = st.file_uploader("Choose a photo...", type="jpg")
 
-#input nilai dari variable independent
-highwaympg = st.number_input('highwaympg')
-curbweight = st.number_input('curbweight')
-horsepower = st.number_input('horsepower')
+    # Display the submitted biodata
+    st.subheader('Submitted Biodata:')
+    st.write(f'Name: {name}')
+    st.write(f'Age: {age}')
+    st.write(f'Address: {address}')
 
-if st.button('Prediksi'):
-    #prediksi variable yang telah diinputkan
-    car_prediction = model.predict([[highwaympg, curbweight, horsepower]])
-
-    # convert ke string
-    harga_mobil_str = np.array(car_prediction)
-    harga_mobil_float = float(harga_mobil_str)
-
-    #tampilkan hasil prediksi
-    st.write(f'Prediksi harganya adalah {harga_mobil_float:.2f}')
-
-
-progress_text = "Operation in progress. Please wait."
-my_bar = st.progress(0, text=progress_text)
-
-for percent_complete in range(100):
-    time.sleep(0.01)
-    my_bar.progress(percent_complete + 1, text=progress_text)
-time.sleep(1)
-my_bar.empty()
-
-st.button("Refresh")
+    # Display the uploaded photo
+    if uploaded_file is not None:
+        st.image(uploaded_file, caption='Uploaded Photo', use_column_width=True)
