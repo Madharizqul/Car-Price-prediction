@@ -10,6 +10,21 @@ import time
 import streamlit as st
 import matplotlib.pyplot as plt
 
+
+with st.spinner('Wait for it...'):
+    time.sleep(5)
+st.success('Done!')
+
+#ambil waktu saat ini
+now = datetime.datetime.now()
+
+#format waktu tanggal
+formatted_now = now.strftime("%d/%m/%Y %H:%M:%S")
+
+#tampilkan waktu tanggal
+st.write("Waktu tanggal up to date: " + formatted_now)
+
+
 st.title('WELCOME')
 
 menu = ['Home', 'Dashboard', 'Profile']
@@ -78,3 +93,16 @@ elif selected_menu == 'Profile':
     # Display the uploaded photo
     if uploaded_file is not None:
         st.image(uploaded_file, caption='Uploaded Photo', use_column_width=True)
+
+
+
+progress_text = "Operation in progress. Please wait."
+my_bar = st.progress(0, text=progress_text)
+
+for percent_complete in range(100):
+    time.sleep(0.01)
+    my_bar.progress(percent_complete + 1, text=progress_text)
+time.sleep(1)
+my_bar.empty()
+
+st.button("Refresh")
